@@ -9,14 +9,18 @@ import datetime
 import logging
 
 WA_DATA='data/WA-data.json'
+ALL_STATE_DATA='data/all-states-daily.json'
 
+"""
 #Setup Logger
 logging.basicConfig(format='[%(levelname)s] %(message)s',
                     level=logging.INFO)
+"""
 
 class StateData:
 
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         self.start_date = datetime.date.today()
         self.number_of_data_points = 0
         self.death    = np.array([])    
@@ -99,22 +103,40 @@ class StateData:
 
         logging.info("Finished import_json Successfully")
 
-
 def banner():
-    print('+============================+')
-    print('|    WA State COVID Data     |')
-    print('+============================+')
+    print('+=======================================+')
+    print('|    Plotting State COVID Timelines     |')
+    print('+=======================================+')
     print()
+
+def set_up_logger():
+    logging.basicConfig(format='[%(levelname)s] %(message)s')
+
+    logger = logging.getLogger('COVID-Plotting')
+    logger.setLevel(logging.DEBUG)
+    return logger
+
+def extract_single_state(data, state_name):
+    state_data = []
+    for d in data:
+        if d['state'] == state_name:
+            state_data.append(d)
+    return state_data
 
 def main():
     banner()
+    logger = set_up_logger()
 
-    WA = StateData()
+    # Pick state that we should plot
+    state = StateData("WA")
 
-    with open(WA_DATA, 'r') as json_file:
+    logger.info(f"Extracting data for {state.name}")
+    with open(ALL_STATE_DATA, 'r') as json_file:
         data = json.load(json_file)
-        WA.import_json(data)
-
+    state_data = extract_single_state(data, state.name)
+    
+    logger.info("Importing state data")
+    state.import_json(state_data)
     logging.info("Data has been imported, starting to plot")
     
     # Setup figure and grid
@@ -122,33 +144,33 @@ def main():
     gs = gridspec.GridSpec(2,2, height_ratios=[3,1])
 
     # Plot positive numbers (ax00)
-    positive_smoothed = gaussian_filter1d(WA.positive, sigma=2)
+    positive_smoothed = gaussian_filter1d(state.positive, sigma=2)
     ax00 = plt.subplot(gs[0,0])
-    ax00.plot(WA.dates, WA.positive, 'b.-')
-    ax00.plot(WA.dates, positive_smoothed, 'b-.', lw=1)
+    ax00.plot(state.dates, state.positive, 'b.-')
+    ax00.plot(state.dates, positive_smoothed, 'b-.', lw=1)
     ax00.set_title('Positive Cases', weight='bold', fontsize=11)
 
     #Plot positive rate of change (ax10)
-    diff=np.diff(np.insert(WA.positive, 0, 0, axis=0))
+    diff=np.diff(np.insert(state.positive, 0, 0, axis=0))
     diff_smoothed=gaussian_filter1d(diff, sigma=2)
     ax10 = plt.subplot(gs[1,0])
-    ax10.plot(WA.dates, diff, 'g.-')
-    ax10.plot(WA.dates, diff_smoothed, 'g-.', lw=1)
+    ax10.plot(state.dates, diff, 'g.-')
+    ax10.plot(state.dates, diff_smoothed, 'g-.', lw=1)
     ax10.set_title('Change per Day', weight='bold', fontsize=11)
 
     # Plot deaths (ax01)
-    death_smoothed = gaussian_filter1d(WA.death, sigma=2)
+    death_smoothed = gaussian_filter1d(state.death, sigma=2)
     ax01 = plt.subplot(gs[0,1])
-    ax01.plot(WA.dates, WA.death, 'r.-', label='Death')
-    ax01.plot(WA.dates, death_smoothed, 'r-.', lw=1)
+    ax01.plot(state.dates, state.death, 'r.-', label='Death')
+    ax01.plot(state.dates, death_smoothed, 'r-.', lw=1)
     ax01.set_title('Deaths', weight='bold', fontsize=11)
 
     #Plot death rate of change (ax11)
-    diff=np.diff(np.insert(WA.death, 0, 0, axis=0))
+    diff=np.diff(np.insert(state.death, 0, 0, axis=0))
     diff_smoothed=gaussian_filter1d(diff, sigma=2)
     ax11 = plt.subplot(gs[1,1])
-    ax11.plot(WA.dates, diff, 'g.-')
-    ax11.plot(WA.dates, diff_smoothed, 'g-.', lw=1)
+    ax11.plot(state.dates, diff, 'g.-')
+    ax11.plot(state.dates, diff_smoothed, 'g-.', lw=1)
     ax11.set_title('Change per Day', weight='bold', fontsize=11)
 
 
@@ -160,7 +182,7 @@ def main():
             ax.axhline(y=val, linestyle='solid', linewidth=1, alpha=0.3,
                        color='#dddddd', zorder=1)
         ylim=ax.set_ylim(bottom=0)
-        xlim=ax.set_xlim(WA.dates[0])
+        xlim=ax.set_xlim(state.dates[0])
         formatter = mdates.DateFormatter('%m/%d')
         ax.xaxis.set_major_formatter(formatter)
         locator = mdates.DayLocator()
@@ -171,23 +193,23 @@ def main():
 
         # Important dates
         # March 16th, Bar's & Restaurants are closed
-        xloc=WA.dates[12]
+        xloc=state.dates[12]
         ax.axvline(x=xloc)
         ax.text(xloc,1, 'Restaurants Close', fontsize=6,rotation=40)
-        # March 17th, WA schools closed
-        xloc=WA.dates[13]
+        # March 17th, state schools closed
+        xloc=state.dates[13]
         ax.axvline(xloc)
         ax.text(xloc,1, 'Schools Close', fontsize=6,rotation=40)
         # March 23rd, Gov. gives stay at home mandate
-        xloc=WA.dates[19]
+        xloc=state.dates[19]
         ax.axvline(xloc)
         ax.text(xloc,1, 'Stay-at-Home', fontsize=6,rotation=40)
         # March 27th, $2 trillion stimulus bill based
-        xloc=WA.dates[23]
+        xloc=state.dates[23]
         ax.axvline(xloc)
         ax.text(xloc,1, 'Stimulus Bill', fontsize=6,rotation=40)
 
-    fig.suptitle('WA State COVID-19 Timeline', weight='bold', fontsize=17)
+    fig.suptitle('state State COVID-19 Timeline', weight='bold', fontsize=17)
     plt.tight_layout()
     plt.show()
         

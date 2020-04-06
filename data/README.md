@@ -1,7 +1,8 @@
 # Where this came from
 
-```
-curl https://covidtracking.com/api/states/daily?state=WA > WA-data.json
-```
+This data is being pulled fromn https://www.covidtracking.com/
 
-Each day in json blob is the totals up to that day
+`covidtracking.com/api/v1/states/daily.json` returns a json blob with the daily
+results for every day of every state. With the new changes it looks you can't
+pull daily data for a single state, so I am just pulling all of the states.
+
