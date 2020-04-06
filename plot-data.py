@@ -1,3 +1,4 @@
+from sys import argv
 import json
 import numpy as np
 from matplotlib import pyplot as plt
@@ -74,18 +75,20 @@ class StateData:
 
         for day in data:
             logging.debug(day)
-            d = 0 if day['death'] is None else day['death']
-            p = 0 if day['positive'] is None else day['positive']
-            n = 0 if day['negative'] is None else day['negative']
-            t = 0 if day['total'] is None else day['total']
-            pending = 0 if day['pending'] is None else day['pending']
+            d = day.get('death', 0)
+            p = day.get('positive', 0)
+            n = day.get('negative', 0)
+            t = day.get('total', 0)
 
+            """
+            pending = 0 if day['pending'] is None else day['pending']
             # Sanity check for totals
             if (p+n+pending) != t and day['date'] > 20200312:
                 # For some reason deaths were included in total only up until
                 # 2020-03-12
                 logging.warning('Positive & Negative do not add up total on %s',
                                 day['date'])
+            """
 
             # Append data where it belongs
             self.append_death_value(d)
@@ -128,7 +131,11 @@ def main():
     logger = set_up_logger()
 
     # Pick state that we should plot
-    state = StateData("WA")
+    if len(argv)==1:
+        name = 'WA'
+    else:
+        name = argv[1]
+    state = StateData(name)
 
     logger.info(f"Extracting data for {state.name}")
     with open(ALL_STATE_DATA, 'r') as json_file:
@@ -192,6 +199,7 @@ def main():
         ax.xaxis.set_ticks(np.arange(start, end, 2))
 
         # Important dates
+        """
         # March 16th, Bar's & Restaurants are closed
         xloc=state.dates[12]
         ax.axvline(x=xloc)
@@ -208,8 +216,9 @@ def main():
         xloc=state.dates[23]
         ax.axvline(xloc)
         ax.text(xloc,1, 'Stimulus Bill', fontsize=6,rotation=40)
+        """
 
-    fig.suptitle('state State COVID-19 Timeline', weight='bold', fontsize=17)
+    fig.suptitle(f'{state.name} State COVID-19 Timeline', weight='bold', fontsize=17)
     plt.tight_layout()
     plt.show()
         
