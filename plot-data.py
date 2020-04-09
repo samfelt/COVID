@@ -9,14 +9,7 @@ from scipy.misc import derivative
 import datetime
 import logging
 
-WA_DATA='data/WA-data.json'
 ALL_STATE_DATA='data/all-states-daily.json'
-
-"""
-#Setup Logger
-logging.basicConfig(format='[%(levelname)s] %(message)s',
-                    level=logging.INFO)
-"""
 
 class StateData:
 
@@ -55,12 +48,10 @@ class StateData:
         self.dates = np.append(self.dates, [datetime.datetime(year,month,day)])
 
     def import_json(self, json_data):
-        logging.info('Starting import_json')
 
         # Get expected number of data points. This is mainy just for 
         # sanity checks throught the code
         self.set_number_of_data_points(len(json_data))
-        logging.info('Expected number of data points: %s',self.number_of_data_points)
 
         # Sort by date
         data=sorted(json_data, key=lambda k: k['date'])
@@ -71,7 +62,6 @@ class StateData:
         month = int(str(d)[4:6])
         day = int(str(d)[6:8])
         self.set_start_date(datetime.datetime(year, month, day))
-        logging.info('Found start date: %s', self.start_date)
 
         for day in data:
             logging.debug(day)
@@ -101,10 +91,6 @@ class StateData:
         for a in (self.death, self.positive, self.negative, self.total):
             if len(a) != self.number_of_data_points:
                 logging.warning("Incorrect number of data points: %s", a)
-
-        # Somehow check that final data point is the correct date
-
-        logging.info("Finished import_json Successfully")
 
 def banner():
     print('+=======================================+')
@@ -144,7 +130,8 @@ def main():
     
     logger.info("Importing state data")
     state.import_json(state_data)
-    logging.info("Data has been imported, starting to plot")
+    logger.info(f"Start Date: {state.start_date}")
+    logger.info(f"{state.number_of_data_points} days imported")
     
     # Setup figure and grid
     fig = plt.figure(figsize=(13,6))
@@ -156,6 +143,7 @@ def main():
     ax00.plot(state.dates, state.positive, 'b.-')
     ax00.plot(state.dates, positive_smoothed, 'b-.', lw=1)
     ax00.set_title('Positive Cases', weight='bold', fontsize=11)
+    ax00.axes.get_xaxis().set_visible(False)
 
     #Plot positive rate of change (ax10)
     diff=np.diff(np.insert(state.positive, 0, 0, axis=0))
@@ -171,6 +159,7 @@ def main():
     ax01.plot(state.dates, state.death, 'r.-', label='Death')
     ax01.plot(state.dates, death_smoothed, 'r-.', lw=1)
     ax01.set_title('Deaths', weight='bold', fontsize=11)
+    ax01.axes.get_xaxis().set_visible(False)
 
     #Plot death rate of change (ax11)
     diff=np.diff(np.insert(state.death, 0, 0, axis=0))
@@ -222,7 +211,7 @@ def main():
     plt.tight_layout()
     plt.show()
         
-    logging.info("plot-data Complete")
+    logger.info("plot-data Complete")
 
 if __name__=='__main__':
     main()
