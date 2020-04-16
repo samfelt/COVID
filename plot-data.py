@@ -10,6 +10,7 @@ import datetime
 import logging
 
 ALL_STATE_DATA='data/all-states-daily.json'
+COUNTRY_DATA='data/country-daily.json'
 
 class StateData:
 
@@ -121,14 +122,22 @@ def main():
         name = 'WA'
     else:
         name = argv[1]
-    state = StateData(name)
 
-    logger.info(f"Extracting data for {state.name}")
-    with open(ALL_STATE_DATA, 'r') as json_file:
-        data = json.load(json_file)
-    state_data = extract_single_state(data, state.name)
+    # Check if we want country data (special case)
+    state = StateData(name)
+    if name == "US":
+        logger.info(f"Extracting data for the US")
+        logger.info(f"Data file: {COUNTRY_DATA}")
+        with open(COUNTRY_DATA, 'r') as json_file:
+            state_data = json.load(json_file)
+    else:
+        logger.info(f"Extracting data for {state.name}")
+        logger.info(f"Data file: {ALL_STATE_DATA}")
+        with open(ALL_STATE_DATA, 'r') as json_file:
+            data = json.load(json_file)
+        state_data = extract_single_state(data, state.name)
     
-    logger.info("Importing state data")
+    logger.info("Importing data")
     state.import_json(state_data)
     logger.info(f"Start Date: {state.start_date}")
     logger.info(f"{state.number_of_data_points} days imported")
