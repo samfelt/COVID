@@ -216,9 +216,15 @@ def main():
         ax.text(xloc,1, 'Stimulus Bill', fontsize=6,rotation=40)
         """
 
-    fig.suptitle(f'{state.name} State COVID-19 Timeline', weight='bold', fontsize=17)
+    fig.suptitle(f'{state.name} COVID-19 Timeline', weight='bold', fontsize=17)
     plt.tight_layout()
-    plt.show()
+    if len(argv) == 3 and argv[2] == '--save':
+        logger.info(f"Saving {state.name} plot in 'State-Timelines'")
+        plt.savefig(f"State-Timelines/{state.name}-COVID-Timeline.png",
+                    dpi=190)
+    else:
+        logger.info("Plotting")
+        plt.show()
         
     logger.info("plot-data Complete")
 
