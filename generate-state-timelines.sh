@@ -40,7 +40,7 @@ echo -e "${Blue}[i]${NC} ${White}Command:  $SAVE_COMMAND${NC}"
 echo -e "${Blue}[i]${NC} ${White}Location: $LOCATION${NC}"
 echo -e "${Blue}[i]${NC} ${White}Be sure virtual env is active!${NC}"
 echo
-echo -e "${BBlue}[i]${NC} ${BWhite}Generating state timelines${NC}"
+echo -e "${BBlue}[I]${NC} ${BWhite}Generating state timelines${NC}"
 
 for s in ${STATES[@]}; do 
     generate_state_timeline $s

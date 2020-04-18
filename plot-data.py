@@ -221,7 +221,7 @@ def main():
     if len(argv) == 3 and argv[2] == '--save':
         logger.info(f"Saving {state.name} plot in 'State-Timelines'")
         plt.savefig(f"State-Timelines/{state.name}-COVID-Timeline.png",
-                    dpi=190)
+                    dpi=150)
     else:
         logger.info("Plotting")
         plt.show()
