@@ -67,6 +67,8 @@ class StateData:
         for day in data:
             logging.debug(day)
             d = day.get('death', 0)
+            if d is None:
+                d = 0
             p = day.get('positive', 0)
             n = day.get('negative', 0)
             t = day.get('total', 0)
