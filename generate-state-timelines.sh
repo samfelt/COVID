@@ -19,7 +19,7 @@ STATES=('AL' 'AK' 'AZ' 'AR' 'CA' 'CO' 'CT' 'DE' 'FL' 'GA' 'HI' 'ID' 'IL' 'IN'
 function generate_state_timeline()
 {
     echo -ne "    ${NC}[ ] $1${NC}"
-    python plot-data.py $1 --save &> /dev/null
+    python state_plot.py $1 --save &> /dev/null
     retval=$?
     if (( $retval != 0 ));then
         echo -e "\r    ${Red}[X]${NC} "
