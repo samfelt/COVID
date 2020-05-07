@@ -56,7 +56,7 @@ function pull_country_data()
     
     echo -e "    ${Blue}[i]${NC} URL: $url"
     echo -e "    ${Blue}[i]${NC} Data File: $filename"
-    echo -en "    ${NC}[ ] Pulling data for all states${NC}"
+    echo -en "    ${NC}[ ] Pulling data United States${NC}"
     curl -s $url > "$tmp_file"
     retval=$?
     if (( $retval != 0 ));then
