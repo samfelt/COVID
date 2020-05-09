@@ -42,6 +42,10 @@ def animate(i):
         p = plt.plot(state.dates[:i], state.positive[:i])
         p[0].set_color(colors[color_count])
         color_count += 1
+    ax = plt.gca()
+#    for val in ax.get_yticks():
+#        ax.axhline(y=val, linestyle='solid', linewidth=1, alpha=0.3,
+#                   color='#dddddd', zorder=1)
 
 banner()
 logger = set_up_logger()
@@ -96,7 +100,7 @@ plt.ylabel('Positive Cases')
 plt.xlabel('Date')
 plt.title("COVID Timeline")
 
-animator = ani.FuncAnimation(fig, animate, interval = 175)
+animator = ani.FuncAnimation(fig, animate, interval = 150)
 plt.show()
 
 logger.info("plot-data Complete")
