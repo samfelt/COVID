@@ -11,7 +11,7 @@ NC='\033[m'
 #--------[ pull_full_state_data ]----------------------------------------------
 function pull_full_state_data()
 {
-    url='https://covidtracking.com/api/v1/states/daily.json'
+    url='https://api.covidtracking.com/v1/states/daily.json'
     filename='all-states-daily.json'
     tmp_file=".$filename.tmp"
     
@@ -50,7 +50,7 @@ function pull_full_state_data()
 #--------[ pull_country_data ]-------------------------------------------------
 function pull_country_data()
 {
-    url='https://covidtracking.com/api/us/daily'
+    url='https://api.covidtracking.com/v1/us/daily.json'
     filename='country-daily.json'
     tmp_file=".$filename.tmp"
     
